@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:ansi/ansi.dart';
 import 'package:intl/intl.dart';
 import 'package:test/test.dart';
+import 'package:translator/translator.dart';
 
 void main() {
   //clear terminal
@@ -35,17 +36,28 @@ void main() {
   var url = Uri.parse(
       "https://api.openweathermap.org/data/2.5/weather?q=$city&units=metric&appid=$API_KEY");
 
-  http.get(url).then((data) {
+  http.get(url).then((data) async {
     // Status Code
     int statusCode = data.statusCode;
 
     if (statusCode == 200) {
       Map<String, dynamic> response = jsonDecode(data.body);
 
+      final translator = GoogleTranslator();
+
       // Set Values
       String name = response['name'];
       String main = response['weather'][0]['main'];
       String description = response['weather'][0]['description'];
+
+      Translation translatedMain;
+      var translation1 = await translator.translate(main, from: 'en', to: 'uz');
+      translatedMain = translation1;
+
+      Translation translatedDescription;
+      var translation2 = await translator.translate(description, from: 'en', to: 'uz');
+      translatedDescription = translation2;
+
       double temp = response['main']['temp'];
       int humadity = response['main']['humidity'];
       double wind = response['wind']['speed'];
@@ -67,8 +79,8 @@ void main() {
 
       Weather weather = Weather(
           name: name,
-          main: main,
-          description: description,
+          main: translatedMain,
+          description: translatedDescription,
           temp: temp,
           humadity: humadity,
           wind: wind,
@@ -85,8 +97,8 @@ void main() {
 
 class Weather {
   final String name;
-  final String main;
-  final String description;
+  final Translation main;
+  final Translation description;
   final double temp;
   final int humadity;
   final double wind;
