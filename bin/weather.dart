@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:ansi/ansi.dart';
 import 'package:intl/intl.dart';
+import 'package:test/test.dart';
 
 void main() {
   //clear terminal
@@ -29,31 +30,25 @@ void main() {
     }
   }
 
+  const API_KEY = "4598024ad9371878506d81c6c262f3b1";
+
   var url = Uri.parse(
-      "https://api.openweathermap.org/data/2.5/weather?q=$city&units=metric&appid=4598024ad9371878506d81c6c262f3b1");
+      "https://api.openweathermap.org/data/2.5/weather?q=$city&units=metric&appid=$API_KEY");
 
   http.get(url).then((data) {
     // Status Code
     int statusCode = data.statusCode;
 
     if (statusCode == 200) {
-      var response = jsonDecode(data.body);
+      Map<String, dynamic> response = jsonDecode(data.body);
 
-      // Get Values
+      // Set Values
       String name = response['name'];
       String main = response['weather'][0]['main'];
       String description = response['weather'][0]['description'];
-      int temp = response['main']['temp'].ceil();
+      double temp = response['main']['temp'];
       int humadity = response['main']['humidity'];
       double wind = response['wind']['speed'];
-
-      // Show Values
-      print('');
-      print(bgGreen("  Weather report: $name  \n"));
-      print("${green("Main:")} $main ($description)");
-      print("${green("Temp:")} $temp °C");
-      print("${green("Humadity:")} $humadity %");
-      print("${green("Wind:")} $wind km/h");
 
       // Sunrise and Sunset formatting
       int sunriseTimestamp = response['sys']['sunrise'];
@@ -70,13 +65,54 @@ void main() {
       String formattedSunrise = formatter.format(sunriseDate);
       String formattedSunset = formatter.format(sunsetDate);
 
-      print('${yellow("Sunrise:")} $formattedSunrise');
-      print('${yellow("Sunset:")} $formattedSunset');
-      print(green('------------------------------'));
+      Weather weather = Weather(
+          name: name,
+          main: main,
+          description: description,
+          temp: temp,
+          humadity: humadity,
+          wind: wind,
+          formattedSunrise: formattedSunrise,
+          formattedSunset: formattedSunset);
+      weather.displayWeather();
     } else if (statusCode == 404) {
       print(red("Not found!"));
     } else {
       print(red("Something went wrong. Try again later!"));
     }
   });
+}
+
+class Weather {
+  final String name;
+  final String main;
+  final String description;
+  final double temp;
+  final int humadity;
+  final double wind;
+  final String formattedSunrise;
+  final String formattedSunset;
+
+  Weather(
+      {required this.name,
+      required this.main,
+      required this.description,
+      required this.temp,
+      required this.humadity,
+      required this.wind,
+      required this.formattedSunrise,
+      required this.formattedSunset});
+
+  void displayWeather() {
+    print("""
+
+${bgGreen("  Weather report: $name  \n")}
+${green("Main:")} $main ($description)
+${green("Temp:")} $temp °C
+${green("Humadity:")} $humadity %
+${green("Wind:")} $wind km/h
+${yellow("Sunrise:")} $formattedSunrise
+${yellow("Sunset:")} $formattedSunset
+${green('------------------------------')}""");
+  }
 }
