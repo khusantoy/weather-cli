@@ -4,33 +4,34 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:ansi/ansi.dart';
 import 'package:intl/intl.dart';
-import 'package:test/test.dart';
 import 'package:translator/translator.dart';
 
 void main() {
   //clear terminal
   print("\x1B[2J\x1B[0;0H");
 
-  print(bgBlue("  Weather App  \n"));
-  print(red("Type exit to exit!\n"));
-  stdout.write("Enter a city name: ");
+  print(bgBlue("  Ob-havo dasturi  \n"));
+  print(red("Shahar nomini kiriting\n"));
+  stdout.write("Shahar nomini kiriting: ");
   String? city = stdin.readLineSync();
 
   if (city!.toLowerCase() == 'exit') {
-    print(red("You leaved!"));
+    print(red("Dasturdan chiqdingiz!"));
     exit(0);
   }
 
+  //check city exists
   while (city == '') {
-    stdout.write("Enter a city name: ");
+    stdout.write("Shahar nomini kiriting: ");
     city = stdin.readLineSync();
 
     if (city!.toLowerCase() == 'exit') {
-      print(red("You leaved!"));
+      print(red("Dasturdan chiqdingiz!"));
       exit(0);
     }
   }
 
+  //API KEY 
   const API_KEY = "4598024ad9371878506d81c6c262f3b1";
 
   var url = Uri.parse(
@@ -43,6 +44,7 @@ void main() {
     if (statusCode == 200) {
       Map<String, dynamic> response = jsonDecode(data.body);
 
+      //translator
       final translator = GoogleTranslator();
 
       // Set Values
@@ -50,10 +52,12 @@ void main() {
       String main = response['weather'][0]['main'];
       String description = response['weather'][0]['description'];
 
+      //translate main to uzbek
       Translation translatedMain;
       var translation1 = await translator.translate(main, from: 'en', to: 'uz');
       translatedMain = translation1;
 
+      //translate description to uzbek
       Translation translatedDescription;
       var translation2 = await translator.translate(description, from: 'en', to: 'uz');
       translatedDescription = translation2;
@@ -88,14 +92,15 @@ void main() {
           formattedSunset: formattedSunset);
       weather.displayWeather();
     } else if (statusCode == 404) {
-      print(red("Not found!"));
+      print(red("Manzil topilmadi!"));
     } else {
-      print(red("Something went wrong. Try again later!"));
+      print(red("Nimadir xato. Keyinroq qaytadan urunib ko'ring!"));
     }
   });
 }
-
+// weather model
 class Weather {
+  //fields
   final String name;
   final Translation main;
   final Translation description;
@@ -105,6 +110,7 @@ class Weather {
   final String formattedSunrise;
   final String formattedSunset;
 
+  //constructor
   Weather(
       {required this.name,
       required this.main,
@@ -115,16 +121,17 @@ class Weather {
       required this.formattedSunrise,
       required this.formattedSunset});
 
+  //display info
   void displayWeather() {
     print("""
 
-${bgGreen("  Weather report: $name  \n")}
-${green("Main:")} $main ($description)
-${green("Temp:")} $temp °C
-${green("Humadity:")} $humadity %
-${green("Wind:")} $wind km/h
-${yellow("Sunrise:")} $formattedSunrise
-${yellow("Sunset:")} $formattedSunset
+${bgGreen("  Ob-havo hisoboti: $name  \n")}
+${green("Asosiy:")} $main ($description)
+${green("Daraja:")} $temp °C
+${green("Namlik:")} $humadity %
+${green("Shamol:")} $wind km/h
+${yellow("Quyosh chiqishi:")} $formattedSunrise
+${yellow("Quyosh botishi:")} $formattedSunset
 ${green('------------------------------')}""");
   }
 }
