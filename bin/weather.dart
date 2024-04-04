@@ -6,6 +6,8 @@ import 'package:ansi/ansi.dart';
 import 'package:intl/intl.dart';
 import 'package:translator/translator.dart';
 
+import '../secret.dart';
+
 void main() {
   //clear terminal
   print("\x1B[2J\x1B[0;0H");
@@ -31,11 +33,11 @@ void main() {
     }
   }
 
-  //API KEY 
-  const API_KEY = "4598024ad9371878506d81c6c262f3b1";
+  //API KEY
+  var apiKey = Apikey.apiKey;
 
   var url = Uri.parse(
-      "https://api.openweathermap.org/data/2.5/weather?q=$city&units=metric&appid=$API_KEY");
+      "https://api.openweathermap.org/data/2.5/weather?q=$city&units=metric&appid=$apiKey");
 
   http.get(url).then((data) async {
     // Status Code
@@ -59,7 +61,8 @@ void main() {
 
       //translate description to uzbek
       Translation translatedDescription;
-      var translation2 = await translator.translate(description, from: 'en', to: 'uz');
+      var translation2 =
+          await translator.translate(description, from: 'en', to: 'uz');
       translatedDescription = translation2;
 
       double temp = response['main']['temp'];
@@ -98,6 +101,7 @@ void main() {
     }
   });
 }
+
 // weather model
 class Weather {
   //fields
