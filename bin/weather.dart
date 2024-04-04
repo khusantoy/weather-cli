@@ -6,7 +6,7 @@ import 'package:ansi/ansi.dart';
 import 'package:intl/intl.dart';
 import 'package:translator/translator.dart';
 
-import '../secret.dart';
+import '../.secret.dart';
 
 void main() {
   //clear terminal
