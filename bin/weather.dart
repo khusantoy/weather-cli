@@ -13,7 +13,6 @@ void main() {
   print("\x1B[2J\x1B[0;0H");
 
   print(bgBlue("  Ob-havo dasturi  \n"));
-  print(red("Shahar nomini kiriting\n"));
   stdout.write("Shahar nomini kiriting: ");
   String? city = stdin.readLineSync();
 
